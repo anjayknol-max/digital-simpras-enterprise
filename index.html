@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background-color: #eef2f6; color: #1f2a37; }
+
+    /* NAVBAR STYLES */
+    .navbar { background: #01314d; box-shadow: 0 6px 24px rgba(0,0,0,0.12); }
+    .navbar-brand { font-weight: 800; letter-spacing: 0.08em; color: #ffffff !important; }
+    .nav-link { font-weight: 500; color: rgba(255,255,255,0.82) !important; transition: all 0.25s ease; }
+    .nav-link:hover, .nav-link.active { color: #ffffff !important; text-shadow: none; }
+    .navbar-toggler-icon { filter: brightness(1.3); }
+
+    /* HERO & FORM SECTION */
+    .hero-section {
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.96)), url('https://lh3.googleusercontent.com/d/1dz4AngYH0vPyof4vSYwjSrXaJwHlhnGQ');
+      background-size: cover;
+      background-position: center;
+      border-radius: 24px;
+      padding: 48px;
+      box-shadow: 0 18px 55px rgba(14, 49, 90, 0.12);
+      border: 1px solid rgba(15, 77, 124, 0.08);
+    }
+    .hero-title { color: #0f4a76; font-weight: 800; letter-spacing: -0.03em; }
+    .form-control, .form-select {
+      border-radius: 14px;
+      padding: 14px 16px;
+      border: 1px solid #d7dee9;
+      background-color: #ffffff;
+      transition: all 0.25s ease;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #0f4a76;
+      box-shadow: 0 0 0 0.18rem rgba(15, 74, 118, 0.16);
+      background-color: #ffffff;
+    }
+    .btn-submit {
+      background: #0f4a76;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      padding: 14px 18px;
+      box-shadow: 0 12px 24px rgba(15, 74, 118, 0.18);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 16px 30px rgba(15, 74, 118, 0.22); }
+
+    /* DASHBOARD STYLES */
+    .page-container { padding: 32px 18px; min-height: calc(100vh - 82px); }
+    .filter-panel { background: #ffffff; padding: 28px; border-radius: 24px; margin-bottom: 28px; border: 1px solid rgba(15, 74, 118, 0.08); }
+    .card { border: 1px solid rgba(15, 74, 118, 0.06); border-radius: 22px; box-shadow: 0 16px 36px rgba(15, 74, 118, 0.08); }
+    .chart-container { position: relative; height: 320px; width: 100%; }
+    .stat-badge {
+      background: linear-gradient(135deg, #0f4a76 0%, #1c7eb8 100%);
+      color: #ffffff;
+      padding: 24px;
+      border-radius: 20px;
+      text-align: center;
+      min-height: 120px;
+    }
+
+    /* ASRAMA STYLES */
+    .asrama-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; }
+    .room-card {
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 16px 28px rgba(15, 74, 118, 0.08);
+      border: 1px solid rgba(15, 74, 118, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .room-card:hover { transform: translateY(-4px); box-shadow: 0 22px 40px rgba(15, 74, 118, 0.12); }
+    .room-header { font-weight: 700; font-size: 1.08rem; color: #102938; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .bed-item {
+      display: flex;
+      align-items: center;
+      background: #f7f9fb;
+      padding: 10px 14px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      font-size: 0.92rem;
+      color: #2f3e53;
+    }
+    .bed-icon { margin-right: 10px; font-size: 1.1rem; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; margin-left: auto; }
+    .dot-kosong { background-color: #1abc9c; }
+    .dot-terisi { background-color: #e74c3c; }
+    .stat-asrama { background: #ffffff; padding: 22px; border-radius: 20px; text-align: center; border: 1px solid rgba(15, 74, 118, 0.08); }
+
+    /* LABEL PREVIEW STYLES */
+    .label-preview-wrapper { background: #f4f7fb; padding: 22px; border-radius: 20px; border: 1px solid rgba(15, 74, 118, 0.08); }
+    .maintenance-label {
+      background: #ffffff;
+      border: 1px solid rgba(15, 74, 118, 0.12);
+      width: 100%;
+      max-width: 420px;
+      padding: 24px;
+      border-radius: 20px;
+      box-shadow: 0 14px 30px rgba(15, 74, 118, 0.06);
+    }
+    .label-header {
+      background: #0f4a76;
+      color: #ffffff;
+      text-align: center;
+      padding: 12px 0;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      margin: -24px -24px 20px -24px;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+    }
+    .label-row { margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #e6eaef; }
+    .label-title { font-size: 0.75rem; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.08em; }
+    .label-data { font-size: 1.05rem; font-weight: 700; color: #152238; }
+    .label-data-sm { font-size: 0.92rem; font-weight: 600; color: #0f4a76; }
+    .label-footer { margin-top: 16px; font-size: 0.78rem; text-align: center; color: #8492a6; }
+
+    /* TABLE STYLES */
+    .table-responsive { background: #ffffff; border-radius: 22px; padding: 20px; max-height: 520px; overflow-y: auto; border: 1px solid rgba(15, 74, 118, 0.08); }
+    .table th { background-color: #eff4fb; color: #152238; font-weight: 700; padding: 16px; border-bottom: 1px solid rgba(15, 74, 118, 0.1); }
+    .table td { vertical-align: middle; }
+
+    .status-select { border-radius: 999px; font-weight: 600; font-size: 0.82rem; cursor: pointer; padding: 8px 14px; min-width: 165px; }
+    .bg-status-proses { background-color: #f6d365 !important; color: #1f2a37 !important; border: 1px solid #e8c46d; }
+    .bg-status-hold { background-color: #dce4ea !important; color: #1f2a37 !important; border: 1px solid #adbcc8; }
+    .bg-status-selesai { background-color: #2ecc71 !important; color: #ffffff !important; border: 1px solid #24a35c; }
+    .bg-status-hapus { background-color: #e74c3c !important; color: #ffffff !important; border: 1px solid #c0392b; }
+
+    .cetak-header { display: none; text-align: center; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid #d7dee9; }
+    @media print {
+      .btn, .filter-panel, .navbar, .modal { display: none !important; }
+      .page-container { padding: 0; background: white; }
+    }
+  </style>
+  <style>
+    .navbar .dropdown-menu {
+      border-radius: 16px;
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.92);
+      min-width: 220px;
+    }
+    .navbar .dropdown-item {
+      color: #0f4a76;
+      font-weight: 600;
+    }
+    .navbar .dropdown-item:hover {
+      background: rgba(15, 74, 118, 0.08);
+    }
+    .theme-toggle-btn {
+      width: 48px;
+      min-width: 48px;
+    }
+    .body-dark {
+      background-color: #0f172a;
+      color: #e2e8f0;
+    }
+    .body-dark .navbar { background: #071423; }
+    .body-dark .card,
+    .body-dark .filter-panel,
+    .body-dark .room-card,
+    .body-dark .label-preview-wrapper,
+    .body-dark .maintenance-label,
+    .body-dark .table-responsive {
+      background: #111d33;
+      border-color: rgba(255,255,255,0.08);
+    }
+    .body-dark .form-control,
+    .body-dark .form-select {
+      background: #101d33;
+      border-color: rgba(255,255,255,0.14);
+      color: #e2e8f0;
+    }
+    .body-dark .form-control:focus,
+    .body-dark .form-select:focus {
+      box-shadow: 0 0 0 0.18rem rgba(56, 189, 248, 0.24);
+    }
+    .body-dark .text-muted { color: #94a3b8 !important; }
+    .body-dark .navbar-brand,
+    .body-dark .nav-link { color: #e2e8f0 !important; }
+    .body-dark .btn-outline-light { color: #e2e8f0; border-color: rgba(255,255,255,0.24); }
+    .body-dark .btn-primary { background: #1366b3; border-color: #0f5ab0; }
+    .body-dark .badge.bg-white { background: rgba(255,255,255,0.12) !important; color: #e2e8f0 !important; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+      <span class="fs-4">🏢</span> DIGITAL <strong>SIMPRAS</strong>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link active" id="nav-input" onclick="switchPage('input')"> Input Laporan</a></li>
+        <li class="nav-item">
+          <a class="nav-link" id="nav-monitoring" onclick="switchPage('monitoring')">
+            🔍 Cek Status <span id="badge-status-baru" class="badge bg-danger rounded-pill badge-pulse d-none ms-1">1 Baru</span>
+          </a>
+        </li>
+        <li class="nav-item"><a class="nav-link" id="nav-label" onclick="switchPage('label')">🏷️ Cetak Label</a></li>
+        
+        <!-- Menu Admin Terpisah Berdasarkan Role -->
+        <li class="nav-item d-none" id="nav-dashboard-li"><a class="nav-link" id="nav-dashboard" onclick="switchPage('dashboard')">📊 Dashboard Admin</a></li>
+        <li class="nav-item d-none" id="nav-asrama-li"><a class="nav-link" id="nav-asrama" onclick="switchPage('asrama')">🏠 Kelola Asrama</a></li>
+      </ul>
+      <div class="d-flex align-items-center gap-2">
+        <button id="btn-login-nav" class="btn btn-light fw-bold text-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#loginModal">Login Admin</button>
+        <button id="btn-logout-nav" class="btn btn-danger fw-bold rounded-pill px-4 shadow-sm d-none" onclick="handleLogout()">Logout</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MODAL LOGIN -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+      <div class="modal-header border-0 pb-0 justify-content-center mt-4">
+        <h4 class="fw-bold text-primary">Akses Admin</h4>
+      </div>
+      <div class="modal-body p-4">
+        <div class="alert alert-info small mb-4 rounded-3 border-0">
+          <strong>Keterangan Akses:</strong><br>
+          • Login Sarpras (Username: <code>sarpras</code>)<br>
+          • Login Asrama (Username: <code>asrama</code>)
+        </div>
+        <div id="loginAlert" class="alert alert-danger d-none small rounded-3"></div>
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-muted">Username</label>
+          <input type="text" id="userInput" class="form-control" placeholder="Masukkan username">
+        </div>
+        <div class="mb-4">
+          <label class="form-label small fw-bold text-muted">Password</label>
+          <input type="password" id="passInput" class="form-control" placeholder="Masukkan password">
+        </div>
+        <button id="btnLoginSubmit" class="btn btn-primary w-100 py-3 fw-bold rounded-3" onclick="handleLogin()">MASUK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HALAMAN 1: INPUT LAPORAN -->
+<div id="input-page" class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="hero-section">
+        <div class="text-center mb-5">
+          <h2 class="hero-title">Sistem Informasi Manajemen Perbaikan Sarana & Prasarana</h2>
+          <p class="text-muted fw-medium">Digital Sistem Sarpras BPVP Banyuwangi.</p>
+        </div>
+        
+        <div id="alertInput" class="alert d-none small rounded-3"></div>
+        
+        <form id="formLaporan">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <label class="form-label fw-bold small text-muted">Nama Pelapor <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="inputNama" required placeholder="Nama lengkap Anda">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold small text-muted">No. HP (WhatsApp) <span class="text-danger">*</span></label>
+              <input type="tel" class="form-control" id="inputHP" required placeholder="Contoh: 081234567xxx">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold small text-muted">Nama Barang / Sarpras <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="inputBarang" required placeholder="Cth: AC Daikin 1 PK">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold small text-muted">Lokasi Spesifik <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="inputUnit" required placeholder="Cth: Dinding Sebelah Timur Ruang Penyelenggara">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-bold small text-muted">NUP & Kode Barang <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="inputLokasi" required placeholder="Cth: 46-3050201999">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-bold small text-muted">Deskripsi Kerusakan <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="inputDeskripsi" rows="4" required placeholder="Jelaskan kendala secara detail..."></textarea>
+            </div>
+            <div class="col-12 mt-4">
+              <button type="button" class="btn btn-primary btn-submit w-100 text-white" id="btnSimpanLaporan" onclick="submitLaporan()">
+                KIRIM LAPORAN SEKARANG
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HALAMAN 2: MONITORING PUBLIK -->
+<div id="monitoring-page" class="container mt-5 mb-5" style="display: none;">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card p-4">
+        <h3 class="fw-bold text-dark mb-1">🔍 Pantau Status Laporan</h3>
+        <p class="text-muted small mb-4">Cari berdasarkan nama barang, nama pelapor, atau unit kerja.</p>
+        
+        <div class="mb-4">
+          <input type="text" id="searchMonitoring" class="form-control form-control-lg shadow-sm" placeholder="Ketik nama barang / pelapor untuk mencari..." onkeyup="filterMonitoring()">
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="sticky-top">
+              <tr>
+                <th>Tanggal Masuk</th>
+                <th>Pelapor</th>
+                <th>Nama & Kode Barang</th>
+                <th>Kendala</th>
+                <th class="text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="monitoring-tbody">
+              <tr><td colspan="5" class="text-center text-muted py-4">Memuat data... <span class="spinner-border spinner-border-sm"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HALAMAN 3: CETAK LABEL MAINTENANCE PILIHAN ANDA -->
+<div id="label-page" class="container mt-5 mb-5" style="display: none;">
+  <div class="row">
+    <div class="col-lg-6 mb-4">
+      <div class="card p-4 h-100">
+        <h4 class="fw-bold text-dark mb-4">🏷️ Input Data Perbaikan</h4>
+        <form id="formLabel">
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Nama Barang / Aset <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="lblBarang" placeholder="Cth: AC Ruang Instruktur Workshop Otomotif" onkeyup="updatePreview()">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Part yang Diganti / Diperbaiki</label>
+            <textarea class="form-control" id="lblPart" rows="3" placeholder="Cth: Tambah Freon & Ganti Kapasitor" onkeyup="updatePreview()"></textarea>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold small text-muted">Tanggal Diperbaiki</label>
+              <input type="date" class="form-control" id="lblTanggal" onchange="updatePreview()">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold small text-muted">Nama Vendor <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="lblTeknisi" placeholder="Cth: CV Merdeka Jaya" onkeyup="updatePreview()">
+            </div>
+          </div>
+        </form>
+        <button id="btnCetakLabel" class="btn btn-submit text-white mt-auto w-100" onclick="cetakLabelPDF(event)">🖨️ CETAK & KIRIM LABEL PDF</button>
+      </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+      <div class="card p-4 h-100 d-flex flex-column">
+        <h6 class="fw-bold text-muted mb-3 text-center">LIVE PREVIEW LABEL</h6>
+        <div class="label-preview-wrapper flex-grow-1">
+          <div id="area-label-cetak" class="maintenance-label">
+            <div class="label-header">MAINTENANCE RECORD</div>
+            <div class="label-row">
+              <span class="label-title">Equipment / Asset</span>
+              <span class="label-data" id="prevBarang">-</span>
+            </div>
+            <div class="label-row">
+              <span class="label-title">Repaired / Replaced Parts</span>
+              <span class="label-data-sm" id="prevPart" style="white-space: pre-wrap;">-</span>
+            </div>
+            <div class="label-row border-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <span class="label-title d-block">Date of Repair</span>
+                  <span class="label-data-sm text-dark" id="prevTanggal">-</span>
+                </div>
+                <div class="text-end">
+                  <span class="label-title d-block">Technician</span>
+                  <span class="label-data-sm text-dark" id="prevTeknisi">-</span>
+                </div>
+              </div>
+            </div>
+            <div class="label-footer">DIGITAL SIMPRAS SYSTEM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HALAMAN 4: DASHBOARD ADMIN SARPRAS -->
+<div id="dashboard-page" class="page-container container-fluid" style="display: none;">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold text-dark mb-0">Dashboard Analitik Sarpras</h3>
+        <p class="text-muted small mb-0">Monitoring data perbaikan dan kerusakan sarpras terpadu.</p>
+      </div>
+      <div>
+        <button id="btnCetak" class="btn btn-outline-primary px-3 fw-bold rounded-pill" onclick="cetakLaporanPDF()">🖨️ Cetak Laporan PDF</button>
+        <button id="btnCetakHapus" class="btn btn-outline-danger px-3 fw-bold rounded-pill ms-2" onclick="cetakLaporanHapusPDF()">🗑️ Cetak Penghapusan</button>
+      </div>
+    </div>
+
+    <div class="filter-panel">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-3">
+          <label class="small fw-bold text-muted mb-1">TAHUN</label>
+          <select id="filterTahun" class="form-select" onchange="applyFilter()"></select>
+        </div>
+        <div class="col-md-3">
+          <label class="small fw-bold text-muted mb-1">BULAN</label>
+          <select id="filterBulan" class="form-select" onchange="applyFilter()">
+            <option value="All">REKAP TAHUNAN</option>
+            <option value="Januari">Januari</option><option value="Februari">Februari</option>
+            <option value="Maret">Maret</option><option value="April">April</option>
+            <option value="Mei">Mei</option><option value="Juni">Juni</option>
+            <option value="Juli">Juli</option><option value="Agustus">Agustus</option>
+            <option value="September">September</option><option value="Oktober">Oktober</option>
+            <option value="November">November</option><option value="Desember">Desember</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="small fw-bold text-muted mb-1">UNIT KERJA</label>
+          <select id="filterUnit" class="form-select" onchange="applyFilter()">
+            <option value="All">Semua Unit</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-badge w-100">
+            <div class="small fw-bold opacity-75">TOTAL LAPORAN</div>
+            <div id="stat-total" class="display-6 fw-bold mb-0">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AREA CETAK PDF SARPRAS -->
+    <div id="area-cetak-pdf">
+      <div id="kop-cetak" class="cetak-header">
+        <h3 class="fw-bold mb-1">LAPORAN MONITORING SARANA & PRASARANA</h3>
+        <h5 id="subtitle-cetak" class="text-muted"></h5>
+      </div>
+
+      <div id="section-charts">
+        <div class="row g-4 mb-4" id="row-grafik">
+          <div class="col-lg-4">
+            <div class="card p-4 h-100"><h6 class="fw-bold">Penyelesaian Status</h6><div class="chart-container"><canvas id="statusChart"></canvas></div></div>
+          </div>
+          <div class="col-lg-8">
+            <div class="card p-4 h-100"><h6 class="fw-bold">Tren Laporan Masuk</h6><div class="chart-container"><canvas id="trendChart"></canvas></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="section-tabel">
+        <div class="card p-0 overflow-hidden" id="row-tabel">
+          <div class="p-3" style="background-color: #f8fafc; border-bottom: 1px solid #dfe6e9;">
+            <h6 class="mb-0 fw-bold text-dark">Rincian Riwayat Laporan Terkini</h6>
+          </div>
+          <div class="table-responsive" id="tabel-container">
+            <table class="table table-hover align-middle small mb-0 border-top-0">
+              <thead class="sticky-top">
+                <tr>
+                  <th width="15%">Tanggal</th>
+                  <th width="20%">Pelapor</th>
+                  <th width="25%">Barang/Sarpras</th>
+                  <th width="25%">Deskripsi Kerusakan</th>
+                  <th width="15%" class="text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody id="table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </div>
+</div>
+
+<!-- HALAMAN 5: KELOLA ASRAMA -->
+<div id="asrama-page" class="page-container container-fluid" style="display: none;">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold text-dark mb-0">🏠 Monitoring Asrama</h3>
+        <p class="text-muted small mb-0">Manajemen okupansi kamar dan kasur asrama secara terpadu.</p>
+      </div>
+      <div>
+        <button class="btn btn-primary px-4 fw-bold rounded-pill shadow-sm" onclick="loadDataAsrama()">🔄 Segarkan Data</button>
+      </div>
+    </div>
+
+    <!-- Statistik Asrama -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="stat-asrama shadow-sm">
+          <h6 class="text-muted fw-bold mb-1">TOTAL KAMAR</h6>
+          <h2 class="text-dark fw-bold mb-0">16</h2>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-asrama shadow-sm" style="border-bottom-color: #0984e3;">
+          <h6 class="text-muted fw-bold mb-1">KAPASITAS BED</h6>
+          <h2 class="text-dark fw-bold mb-0">64</h2>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-asrama shadow-sm" style="border-bottom-color: #d63031;">
+          <h6 class="text-muted fw-bold mb-1">BED TERISI</h6>
+          <h2 class="text-danger fw-bold mb-0" id="stat-bed-terisi">0</h2>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-asrama shadow-sm" style="border-bottom-color: #00b894;">
+          <h6 class="text-muted fw-bold mb-1">BED KOSONG</h6>
+          <h2 class="text-success fw-bold mb-0" id="stat-bed-kosong">64</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid Kamar Asrama -->
+    <div id="grid-asrama" class="asrama-grid">
+      <div class="text-center py-5 w-100 col-12"><span class="spinner-border text-primary"></span> Memuat data asrama...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Edit Asrama -->
+<div class="modal fade" id="modalAsrama" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+      <div class="modal-header border-0 pb-0 mt-3 px-4">
+        <h5 class="fw-bold text-primary" id="modalAsramaTitle">Kelola Kamar 1</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p class="small text-muted mb-4">Ketik nama penghuni untuk check-in, atau kosongkan kolom untuk check-out.</p>
+        <input type="hidden" id="editKamarNo">
+        <div class="mb-3">
+          <label class="form-label small fw-bold">🛏️ Bed 1 (Kanan Bawah)</label>
+          <input type="text" id="editBed1" class="form-control" placeholder="Nama Penghuni / Kosongkan">
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-bold">🛏️ Bed 2 (Kanan Atas)</label>
+          <input type="text" id="editBed2" class="form-control" placeholder="Nama Penghuni / Kosongkan">
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-bold">🛏️ Bed 3 (Kiri Bawah)</label>
+          <input type="text" id="editBed3" class="form-control" placeholder="Nama Penghuni / Kosongkan">
+        </div>
+        <div class="mb-4">
+          <label class="form-label small fw-bold">🛏️ Bed 4 (Kiri Atas)</label>
+          <input type="text" id="editBed4" class="form-control" placeholder="Nama Penghuni / Kosongkan">
+        </div>
+        <button id="btnSimpanAsrama" class="btn btn-primary w-100 py-3 fw-bold rounded-3" onclick="simpanAsrama()">SIMPAN PERUBAHAN KAMAR</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Area Cetak Hapus Aset -->
+<div id="area-cetak-hapus" style="display: none; padding: 30px; background: white; color: black; width: 100%;">
+  <div style="text-align: center; border-bottom: 3px solid black; padding-bottom: 10px; margin-bottom: 25px;">
+    <h3 style="margin: 0; font-weight: bold;">LAPORAN DATA PENGHAPUSAN ASET (BARANG RUSAK BERAT)</h3>
+    <h5 style="margin: 5px 0 0 0; font-weight: normal;" id="periode-hapus">Periode: -</h5>
+  </div>
+  <table style="width: 100%; border-collapse: collapse; font-size: 12px;" border="1">
+    <thead>
+      <tr style="background-color: #f2f2f2;">
+        <th style="padding: 10px; border: 1px solid black; text-align: center;">No</th>
+        <th style="padding: 10px; border: 1px solid black; text-align: center;">Tanggal Laporan</th>
+        <th style="padding: 10px; border: 1px solid black; text-align: center;">Nama Barang & Kode (NUP)</th>
+        <th style="padding: 10px; border: 1px solid black; text-align: center;">Lokasi / Unit Kerja</th>
+        <th style="padding: 10px; border: 1px solid black; text-align: center;">Alasan Kerusakan</th>
+        <th style="padding: 10px; border: 1px solid black; text-align: center;">Pelapor</th>
+      </tr>
+    </thead>
+    <tbody id="tbody-cetak-hapus"></tbody>
+  </table>
+</div>
+
+<script>
+  let rawData = []; let monitoringData = []; let dataAsrama = [];
+  let charts = {}; let isAdminLoggedIn = false; 
+  let currentRole = ""; 
+  const monthOrder = { "Januari":1, "Februari":2, "Maret":3, "April":4, "Mei":5, "Juni":6, "Juli":7, "Agustus":8, "September":9, "Oktober":10, "November":11, "Desember":12 };
+
+  // ==========================================
+  // NAVIGASI & HAK AKSES ROLE
+  // ==========================================
+  function switchPage(page) {
+    if (page === 'dashboard' && (!isAdminLoggedIn || currentRole !== 'sarpras')) return;
+    if (page === 'asrama' && (!isAdminLoggedIn || currentRole !== 'asrama')) return;
+
+    ['input', 'monitoring', 'label', 'dashboard', 'asrama'].forEach(p => { 
+      const el = document.getElementById(`${p}-page`);
+      if(el) el.style.display = 'none'; 
+      const nav = document.getElementById(`nav-${p}`);
+      if(nav) nav.classList.remove('active'); 
+    });
+
+    document.getElementById(`${page}-page`).style.display = 'block'; 
+    document.getElementById(`nav-${page}`).classList.add('active');
+    
+    if(page === 'dashboard') loadData();
+    if(page === 'asrama') loadDataAsrama();
+    if(page === 'monitoring') loadMonitoringData();
+    
+    const navCol = document.getElementById('navbarNav'); 
+    if(navCol && navCol.classList.contains('show')) bootstrap.Collapse.getInstance(navCol).hide();
+  }
+
+  function handleLogin() {
+    const u = document.getElementById('userInput').value;
+    const p = document.getElementById('passInput').value;
+    const btn = document.getElementById('btnLoginSubmit');
+    const alertBox = document.getElementById('loginAlert');
+    
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Memeriksa...'; 
+    btn.disabled = true;
+
+    google.script.run.withSuccessHandler(res => {
+      btn.innerHTML = 'MASUK'; 
+      btn.disabled = false;
+      
+      if(res.success) { 
+        isAdminLoggedIn = true; 
+        currentRole = res.role; 
+        
+        bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+        document.getElementById('btn-login-nav').classList.add('d-none'); 
+        document.getElementById('btn-logout-nav').classList.remove('d-none');
+        
+        if (currentRole === 'sarpras') {
+          document.getElementById('nav-dashboard-li').classList.remove('d-none');
+          document.getElementById('nav-asrama-li').classList.add('d-none');
+          switchPage('dashboard');
+        } else if (currentRole === 'asrama') {
+          document.getElementById('nav-asrama-li').classList.remove('d-none');
+          document.getElementById('nav-dashboard-li').classList.add('d-none');
+          switchPage('asrama');
+        }
+      } else { 
+        alertBox.innerText = res.message; 
+        alertBox.classList.remove('d-none'); 
+      }
+    }).checkLogin(u, p);
+  }
+
+  function handleLogout() {
+    isAdminLoggedIn = false; 
+    currentRole = "";
+    
+    document.getElementById('nav-dashboard-li').classList.add('d-none');
+    document.getElementById('nav-asrama-li').classList.add('d-none');
+    document.getElementById('btn-login-nav').classList.remove('d-none'); 
+    document.getElementById('btn-logout-nav').classList.add('d-none');
+    
+    document.getElementById('userInput').value = "";
+    document.getElementById('passInput').value = "";
+    document.getElementById('loginAlert').classList.add('d-none');
+    
+    switchPage('input');
+  }
+
+  // ==========================================
+  // FITUR CETAK LABEL PEMeliharaan (MAINTENANCE)
+  // ==========================================
+  function updatePreview() {
+    document.getElementById('prevBarang').innerText = document.getElementById('lblBarang').value || '-';
+    document.getElementById('prevPart').innerText = document.getElementById('lblPart').value || '-';
+    document.getElementById('prevTeknisi').innerText = document.getElementById('lblTeknisi').value || '-';
+    const tgl = document.getElementById('lblTanggal').value;
+    document.getElementById('prevTanggal').innerText = tgl ? `${tgl.split('-')[2]}/${tgl.split('-')[1]}/${tgl.split('-')[0]}` : '-';
+  }
+
+  async function cetakLabelPDF(e) {
+    const area = document.getElementById('area-label-cetak'), btn = e.target;
+    const lData = { barang: document.getElementById('lblBarang').value, part: document.getElementById('lblPart').value, tanggal: document.getElementById('lblTanggal').value, teknisi: document.getElementById('lblTeknisi').value };
+
+    if(!lData.barang || !lData.teknisi) { alert("Harap isi Nama Barang dan Teknisi!"); return; }
+    const ori = btn.innerText; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Unduh...';
+    btn.disabled = true;
+    try {
+      google.script.run.simpanLabel(lData);
+      await html2pdf().set({ margin: 0.1, filename: `Label_${lData.barang}.pdf`, image: { type: 'jpeg', quality: 1 }, html2canvas: { scale: 3 }, jsPDF: { unit: 'px', format: [area.offsetWidth + 20, area.offsetHeight + 20], orientation: 'landscape' } }).from(area).save();
+    } catch(err) { alert("Gagal: " + err.message); } finally { btn.innerHTML = ori; btn.disabled = false; }
+  }
+
+  // ==========================================
+  // FITUR KELOLA ASRAMA
+  // ==========================================
+  function loadDataAsrama() {
+    document.getElementById('grid-asrama').innerHTML = '<div class="text-center py-5 w-100 col-12"><span class="spinner-border text-primary"></span> Mengambil data asrama...</div>';
+    google.script.run.withSuccessHandler(data => {
+      dataAsrama = data; renderGridAsrama(data);
+    }).getAsramaData();
+  }
+
+  function renderGridAsrama(data) {
+    const grid = document.getElementById('grid-asrama');
+    let html = '';
+    let totalTerisi = 0;
+
+    data.forEach(row => {
+      const kamarNo = row[0];
+      const beds = [row[1] || '', row[2] || '', row[3] || '', row[4] || ''];
+
+      let bedHtml = '';
+      beds.forEach(bed => {
+        const isKosong = bed.toString().trim() === '';
+        const namaPenghuni = isKosong ? "Kosong" : bed;
+        const dotClass = isKosong ? "dot-kosong" : "dot-terisi";
+        const textClass = isKosong ? "text-muted" : "text-dark fw-bold";
+        if (!isKosong) totalTerisi++;
+
+        bedHtml += `
+          <div class="bed-item">
+            <span class="bed-icon">🛏️</span>
+            <span class="${textClass} text-truncate" style="max-width:140px;">${namaPenghuni}</span>
+            <div class="status-dot ${dotClass}"></div>
+          </div>
+        `;
+      });
+
+      html += `
+        <div class="room-card" data-kamar="${kamarNo}"
+             data-bed1="${safeAttr(beds[0])}"
+             data-bed2="${safeAttr(beds[1])}"
+             data-bed3="${safeAttr(beds[2])}"
+             data-bed4="${safeAttr(beds[3])}">
+          <div class="room-header">
+            <span>Kamar ${kamarNo}</span>
+            <span class="badge bg-light text-dark border">4 Bed</span>
+          </div>
+          <div>${bedHtml}</div>
+        </div>
+      `;
+    });
+
+    grid.innerHTML = html;
+    grid.querySelectorAll('.room-card').forEach(card => {
+      card.addEventListener('click', () => {
+        bukaModalAsrama(
+          card.dataset.kamar,
+          decodeURIComponent(card.dataset.bed1),
+          decodeURIComponent(card.dataset.bed2),
+          decodeURIComponent(card.dataset.bed3),
+          decodeURIComponent(card.dataset.bed4)
+        );
+      });
+    });
+
+    document.getElementById('stat-bed-terisi').innerText = totalTerisi;
+    document.getElementById('stat-bed-kosong').innerText = 64 - totalTerisi;
+  }
+
+  function bukaModalAsrama(kamarNo, b1 = '', b2 = '', b3 = '', b4 = '') {
+    const fix = v => (!v || v === 'undefined') ? '' : v;
+    document.getElementById('modalAsramaTitle').innerText = "Kelola Kamar " + kamarNo;
+    document.getElementById('editKamarNo').value = kamarNo;
+    document.getElementById('editBed1').value = fix(b1);
+    document.getElementById('editBed2').value = fix(b2);
+    document.getElementById('editBed3').value = fix(b3);
+    document.getElementById('editBed4').value = fix(b4);
+    new bootstrap.Modal(document.getElementById('modalAsrama')).show();
+  }
+
+  function simpanAsrama() {
+    const btn = document.getElementById('btnSimpanAsrama');
+    const no = document.getElementById('editKamarNo').value;
+    const b1 = document.getElementById('editBed1').value;
+    const b2 = document.getElementById('editBed2').value;
+    const b3 = document.getElementById('editBed3').value;
+    const b4 = document.getElementById('editBed4').value;
+    
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
+    btn.disabled = true;
+
+    google.script.run.withSuccessHandler(res => {
+      btn.innerHTML = 'SIMPAN PERUBAHAN KAMAR';
+      btn.disabled = false;
+      if (res.success) {
+        bootstrap.Modal.getInstance(document.getElementById('modalAsrama')).hide();
+        loadDataAsrama(); 
+      } else {
+        alert("Gagal: " + res.message);
+      }
+    }).simpanDataAsrama(no, b1, b2, b3, b4);
+  }
+
+  // ==========================================
+  // DASHBOARD ADMIN & LAPORAN SARPRAS
+  // ==========================================
+  function loadData() {
+    const statEl = document.getElementById('stat-total');
+    if(statEl) statEl.innerHTML = '<span class="spinner-grow spinner-grow-sm"></span>';
+    
+    google.script.run.withSuccessHandler(data => {
+      rawData = data.rows; 
+      const fThn = document.getElementById('filterTahun');
+      const fUnt = document.getElementById('filterUnit');
+      
+      const cThn = fThn.value; const cUnt = fUnt.value;
+      fThn.innerHTML = ''; fUnt.innerHTML = '<option value="All">Semua Unit</option>';
+      
+      data.tahunList.forEach(t => fThn.add(new Option(t, t))); 
+      data.unitKerjaList.forEach(u => fUnt.add(new Option(u, u)));
+      
+      if (cThn && data.tahunList.includes(cThn)) fThn.value = cThn; 
+      if (cUnt && data.unitKerjaList.includes(cUnt)) fUnt.value = cUnt;
+      
+      applyFilter();
+    }).getDashboardData();
+  }
+
+  function applyFilter() {
+    const thn = document.getElementById('filterTahun').value;
+    const bln = document.getElementById('filterBulan').value;
+    const unt = document.getElementById('filterUnit').value;
+
+    const filtered = rawData.filter(r => {
+      const matchTahun = ((r[10] ? r[10].toString() : "") === thn);
+      let matchBulan = true;
+      if (bln !== "All") {
+        const bIdx = monthOrder[bln]; const tgl = r[0].toString().toLowerCase();
+        matchBulan = tgl.includes(bln.toLowerCase()) || tgl.includes("/"+bIdx+"/") || tgl.startsWith(bIdx+"/");
+      }
+      const matchUnit = (unt === "All" || (r[3] && r[3].toString().trim().toLowerCase() === unt.toLowerCase()));
+      return matchTahun && matchBulan && matchUnit;
+    });
+    renderDashboard(filtered);
+  }
+
+  function renderDashboard(data) {
+    document.getElementById('stat-total').innerText = data.length;
+    let statusCounts = { "Proses": 0, "Hold": 0, "Selesai": 0, "Penghapusan Aset": 0 };
+    let trenBulanan = { "Januari":0,"Februari":0,"Maret":0,"April":0,"Mei":0,"Juni":0,"Juli":0,"Agustus":0,"September":0,"Oktober":0,"November":0,"Desember":0 };
+
+    data.forEach(r => {
+      const st = (r[9] || "Proses").trim();
+      if(statusCounts.hasOwnProperty(st)) statusCounts[st]++;
+      const teksTgl = r[0].toString();
+      for (let m in monthOrder) { if (teksTgl.toLowerCase().includes(m.toLowerCase())) { trenBulanan[m]++; break; } }
+    });
+
+    renderAdminTable(data);
+    buildCharts(statusCounts, trenBulanan);
+  }
+
+  function renderAdminTable(data) {
+    const tbody = document.getElementById('table-body');
+    let html = '';
+    if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Tidak ada data.</td></tr>'; return; }
+
+    const statusClassMap = {
+      'Proses': 'bg-status-proses',
+      'Hold': 'bg-status-hold',
+      'Selesai': 'bg-status-selesai',
+      'Penghapusan Aset': 'bg-status-hapus'
+    };
+
+    data.forEach(r => {
+      const indexAsli = rawData.findIndex(rawRow => rawRow[0] === r[0] && rawRow[1] === r[1] && rawRow[4] === r[4]);
+      const curStatus = (r[9] || "Proses").trim();
+      const bgSelect = statusClassMap[curStatus] || 'bg-status-proses';
+
+      html += `<tr>
+        <td class="text-muted small">${r[0]}</td>
+        <td><strong>${r[1]}</strong><br><span class="small text-muted">${r[3]}</span></td>
+        <td><span class="fw-bold text-dark">${r[4]}</span><br><span class="small text-muted">📍 ${r[6]}</span></td>
+        <td class="small text-muted">${r[5]}</td>
+        <td class="text-center">
+          <select class="form-select status-select ${bgSelect}" onchange="changeStatus(this, ${indexAsli})">
+            <option value="Proses" ${curStatus === 'Proses' ? 'selected' : ''}>⏳ Proses</option>
+            <option value="Hold" ${curStatus === 'Hold' ? 'selected' : ''}>⏸️ Hold</option>
+            <option value="Selesai" ${curStatus === 'Selesai' ? 'selected' : ''}>✅ Selesai</option>
+            <option value="Penghapusan Aset" ${curStatus === 'Penghapusan Aset' ? 'selected' : ''}>🗑️ Penghapusan</option>
+          </select>
+        </td>
+      </tr>`;
+    });
+    tbody.innerHTML = html;
+  }
+
+  function changeStatus(el, idx) {
+    google.script.run.withSuccessHandler(res => { if(res.success) loadData(); }).updateStatusLaporan(idx, el.value);
+  }
+
+  function buildCharts(statusCounts, trenBulanan) {
+    if (charts.status) charts.status.destroy(); if (charts.trend) charts.trend.destroy();
+    charts.status = new Chart(document.getElementById('statusChart').getContext('2d'), {
+      type: 'doughnut',
+      data: { labels: ['Proses', 'Hold', 'Selesai', 'Penghapusan Aset'], datasets: [{ data: [statusCounts.Proses, statusCounts.Hold, statusCounts.Selesai, statusCounts['Penghapusan Aset']], backgroundColor: ['#fdcb6e', '#b2bec3', '#00b894', '#d63031'] }] },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+    charts.trend = new Chart(document.getElementById('trendChart').getContext('2d'), {
+      type: 'line',
+      data: { labels: Object.keys(trenBulanan), datasets: [{ label: 'Jumlah Laporan', data: Object.values(trenBulanan), borderColor: '#0984e3', backgroundColor: 'rgba(9, 132, 227, 0.05)', fill: true, tension: 0.3 }] },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+
+  // ==========================================
+  // FUNGSI LAIN (SUBMIT, MONITORING, DLL)
+  // ==========================================
+  function submitLaporan() {
+    const btn = document.getElementById('btnSimpanLaporan'), alertBox = document.getElementById('alertInput');
+    const fData = { nama: document.getElementById('inputNama').value, hp: document.getElementById('inputHP').value, barang: document.getElementById('inputBarang').value, unit: document.getElementById('inputUnit').value, lokasi: document.getElementById('inputLokasi').value, deskripsi: document.getElementById('inputDeskripsi').value };
+
+    if(!fData.nama || !fData.hp || !fData.barang || !fData.unit || !fData.lokasi || !fData.deskripsi) {
+      alertBox.className = "alert alert-warning small rounded-3";
+      alertBox.innerHTML = "<strong>⚠️ Perhatian:</strong> Harap isi semua kolom (*)!"; return;
+    }
+
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sedang Mengirim...'; btn.disabled = true;
+
+    google.script.run.withSuccessHandler(res => {
+      if(res.success) {
+        alertBox.className = "alert alert-success small rounded-3";
+        alertBox.innerHTML = "<strong>✅ Berhasil!</strong> Laporan tersimpan.";
+        document.getElementById('formLaporan').reset();
+        setTimeout(() => alertBox.className = "d-none", 5000);
+      } else { 
+        alertBox.className = "alert alert-danger small rounded-3"; 
+        alertBox.innerText = "Gagal: " + res.message; 
+      }
+      btn.innerHTML = "KIRIM LAPORAN SEKARANG"; btn.disabled = false;
+    }).simpanLaporanBaru(fData);
+  }
+
+  function loadMonitoringData() {
+    document.getElementById('monitoring-tbody').innerHTML = '<tr><td colspan="5" class="text-center py-4">Memuat data... <span class="spinner-border spinner-border-sm"></span></td></tr>';
+    google.script.run.withSuccessHandler(data => {
+      monitoringData = data.rows.slice().reverse();
+      renderMonitoringTable(monitoringData);
+    }).getDashboardData();
+  }
+
+  function renderMonitoringTable(data) {
+    const tbody = document.getElementById('monitoring-tbody');
+    let html = '';
+    if(data.length === 0) {
+      html = '<tr><td colspan="5" class="text-center text-muted py-4">Belum ada data laporan.</td></tr>';
+    } else {
+      data.forEach(r => {
+        const curStatus = r[9] || "Proses";
+        let bgClass =
+          curStatus === 'Selesai' ? 'bg-status-selesai' :
+          curStatus === 'Hold' ? 'bg-status-hold' :
+          curStatus === 'Penghapusan Aset' ? 'bg-status-hapus' :
+          'bg-status-proses';
+        let icon =
+          curStatus === 'Selesai' ? '✅' :
+          curStatus === 'Hold' ? '⏸️' :
+          curStatus === 'Penghapusan Aset' ? '🗑️' :
+          '⏳';
+
+        html += `<tr>
+          <td class="text-muted small">${r[0]}</td>
+          <td><strong>${r[1]}</strong><br><span class="small text-muted">${r[3]}</span></td>
+          <td><span class="fw-bold text-primary">${r[4]}</span><br><span class="small text-muted">📍 ${r[6]}</span></td>
+          <td class="small text-muted">${r[5]}</td>
+          <td class="text-center"><span class="badge-status ${bgClass}">${icon} ${curStatus}</span></td>
+        </tr>`;
+      });
+    }
+    tbody.innerHTML = html;
+  }
+
+  function filterMonitoring() {
+    const query = document.getElementById('searchMonitoring').value.toLowerCase();
+    const filtered = monitoringData.filter(r => r[4].toLowerCase().includes(query) || r[1].toLowerCase().includes(query) || r[3].toLowerCase().includes(query));
+    renderMonitoringTable(filtered);
+  }
+
+  function safeAttr(value) {
+    return encodeURIComponent(value == null ? '' : value.toString());
+  }
+
+  async function cetakLaporanPDF() {
+  const btn = document.getElementById('btnCetak');
+  const oriText = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyiapkan PDF...';
+  btn.disabled = true;
+
+  const element = document.getElementById('area-cetak-pdf');
+  const kopCetak = document.getElementById('kop-cetak');
+  if (kopCetak) kopCetak.style.display = 'block';
+
+  // Ambil teks subtitle filter aktif
+  const tahun = document.getElementById('filterTahun').value;
+  const bulan = document.getElementById('filterBulan').value;
+  const unit = document.getElementById('filterUnit').value;
+  const subTitleEl = document.getElementById('subtitle-cetak');
+  if(subTitleEl) subTitleEl.innerText = `Periode: ${bulan} ${tahun} | Unit: ${unit}`;
+
+  const opt = {
+    margin:       10,
+    filename:     `Laporan_SIMPRAS_${tahun}_${bulan}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, logging: false },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+  };
+
+  try {
+    await html2pdf().set(opt).from(element).save();
+  } catch (err) {
+    alert("Gagal mencetak PDF: " + err.message);
+  } finally {
+    if (kopCetak) kopCetak.style.display = 'none';
+    btn.innerHTML = oriText;
+    btn.disabled = false;
+  }
+}
+  async function cetakLaporanHapusPDF() {
+    const btn = document.getElementById('btnCetakHapus');
+    const originalText = btn.innerHTML;
+    const thn = document.getElementById('filterTahun').value;
+    const bln = document.getElementById('filterBulan').value;
+    const unt = document.getElementById('filterUnit').value;
+
+    const filteredHapus = rawData.filter(r => {
+      const st = (r[9] || "").trim();
+      if (st !== "Penghapusan Aset") return false;
+      const matchTahun = ((r[10] ? r[10].toString() : "") === thn);
+      let matchBulan = true;
+      if (bln !== "All") {
+        const bIdx = monthOrder[bln]; const tgl = r[0].toString().toLowerCase();
+        matchBulan = tgl.includes(bln.toLowerCase()) || tgl.includes("/"+bIdx+"/") || tgl.startsWith(bIdx+"/");
+      }
+      const matchUnit = (unt === "All" || (r[3] && r[3].toString().trim().toLowerCase() === unt.toLowerCase()));
+      return matchTahun && matchBulan && matchUnit;
+    });
+
+    if (filteredHapus.length === 0) {
+      alert("⚠️ Tidak ada data barang dengan status 'Penghapusan Aset' pada filter ini.");
+      return;
+    }
+
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Memproses...';
+    btn.disabled = true;
+
+    let html = '';
+    filteredHapus.forEach((r, idx) => {
+      html += `<tr>
+        <td style="padding: 10px; border: 1px solid black; text-align: center;">${idx + 1}</td>
+        <td style="padding: 10px; border: 1px solid black; text-align: center;">${r[0]}</td>
+        <td style="padding: 10px; border: 1px solid black;"><strong>${r[4]}</strong><br><small>(${r[6]})</small></td>
+        <td style="padding: 10px; border: 1px solid black; text-align: center;">${r[3]}</td>
+        <td style="padding: 10px; border: 1px solid black;">${r[5]}</td>
+        <td style="padding: 10px; border: 1px solid black; text-align: center;">${r[1]}</td>
+      </tr>`;
+    });
+    document.getElementById('tbody-cetak-hapus').innerHTML = html;
+    document.getElementById('periode-hapus').innerText = `Periode: ${bln === 'All' ? 'Rekap Tahunan' : bln} ${thn} | Unit: ${unt}`;
+
+    const area = document.getElementById('area-cetak-hapus');
+    area.style.display = 'block';
+    area.style.position = 'absolute';
+    area.style.top = '-9999px';
+
+    const opt = {
+      margin: 0.5,
+      filename: `Penghapusan_Aset_${bln}_${thn}.pdf`,
+      image: { type: 'jpeg', quality: 1 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' }
+    };
+
+    try {
+      await html2pdf().set(opt).from(area).save();
+    } catch (err) {
+      alert("Gagal mencetak: " + err.message);
+    } finally {
+      area.style.display = 'none';
+      area.style.position = 'static';
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
